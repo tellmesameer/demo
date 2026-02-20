@@ -1,0 +1,21 @@
+python-dotenv
+
+streamlit
+
+langchain
+langchain-core
+langgraph
+
+# Google Gemini (primary LLM + embeddings)
+google-generativeai
+langchain-google-genai
+
+# Optional: other providers
+openai
+anthropic
+
+chromadb
+faiss-cpu
+
+pymupdf
+sqlalchemy
