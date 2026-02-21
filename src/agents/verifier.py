@@ -1,9 +1,12 @@
+import logging
 import re
 from typing import Dict, List
 
 from src.config import paths
 from src.graph.state import VerificationRecord, VerificationState
 from src.rag.vectorstore import IPCBNSRelationalStore, IPCBNSVectorStore
+
+logger = logging.getLogger(__name__)
 
 SECTION_RE = re.compile(r"(?:IPC|BNS)?\s*Section\s*(\d+[A-Z]?)", re.IGNORECASE)
 
@@ -106,33 +109,51 @@ def _fuse(rel: Dict[str, object], vec: Dict[str, object]) -> VerificationRecord:
     }
 
 
-def verifier_node(state: VerificationState) -> VerificationState:
+# ── Lazy singleton stores ────────────────────────────────────────────────────
+
+_rel_store = None
+_vec_store = None
+
+
+def _get_stores():
+    global _rel_store, _vec_store
+    if _rel_store is None:
+        _rel_store = IPCBNSRelationalStore(paths.SQLITE_DB)
+        logger.info("Initialized relational store from %s", paths.SQLITE_DB)
+    if _vec_store is None:
+        _vec_store = IPCBNSVectorStore()
+        logger.info("Initialized vector store")
+    return _rel_store, _vec_store
+
+
+def verifier_node(state: VerificationState) -> dict:
     if state.get("route", "verify") == "direct":
-        state["verifications"] = []
-        state["final_result"] = {
-            "overall_status": "direct_answer",
-            "average_confidence": 1.0,
-            "supported_claims": 0,
-            "contradicted_claims": 0,
-            "uncertain_claims": 0,
-            "total_claims": 0,
+        logger.info("Verifier: skipping (direct route)")
+        return {
+            "verifications": [],
+            "final_result": {
+                "overall_status": "direct_answer",
+                "average_confidence": 1.0,
+                "supported_claims": 0,
+                "contradicted_claims": 0,
+                "uncertain_claims": 0,
+                "total_claims": 0,
+            },
         }
-        return state
 
     claims = state.get("claims", [])
-    rel = IPCBNSRelationalStore(paths.SQLITE_DB)
-    vec = IPCBNSVectorStore()
+    logger.info("Verifying %d claims", len(claims))
+    rel, vec = _get_stores()
 
     verifications: List[VerificationRecord] = []
 
     for claim in claims:
+        logger.debug("Claim: %s", claim[:80])
         rel_score = _score_relational(claim, rel)
         vec_score = _score_vector(claim, vec)
         fused = _fuse(rel_score, vec_score)
         fused["claim"] = claim
         verifications.append(fused)
-
-    state["verifications"] = verifications
 
     supported = sum(1 for v in verifications if v["status"] == "supported")
     contradicted = sum(1 for v in verifications if v["status"] == "contradicted")
@@ -149,12 +170,19 @@ def verifier_node(state: VerificationState) -> VerificationState:
     else:
         overall = "uncertain"
 
-    state["final_result"] = {
-        "overall_status": overall,
-        "average_confidence": float(round(avg_conf, 3)),
-        "supported_claims": supported,
-        "contradicted_claims": contradicted,
-        "uncertain_claims": uncertain,
-        "total_claims": total,
+    logger.info(
+        "Verification complete: overall=%s, supported=%d, contradicted=%d, uncertain=%d, avg_conf=%.3f",
+        overall, supported, contradicted, uncertain, avg_conf,
+    )
+
+    return {
+        "verifications": verifications,
+        "final_result": {
+            "overall_status": overall,
+            "average_confidence": float(round(avg_conf, 3)),
+            "supported_claims": supported,
+            "contradicted_claims": contradicted,
+            "uncertain_claims": uncertain,
+            "total_claims": total,
+        },
     }
-    return state

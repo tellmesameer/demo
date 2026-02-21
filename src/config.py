@@ -84,12 +84,12 @@ class LLMConfig:
 @dataclass
 class ProjectPaths:
     ROOT: str = _PROJECT_ROOT
-    RAW_PDF: str = os.path.join(_PROJECT_ROOT, "data", "raw", "IPC-to-BNS-Conversion-Guide.pdf")
-    PROCESSED_CHUNKS: str = os.path.join(_PROJECT_ROOT, "data", "processed", "ipcbns_chunks.json")
-    SQLITE_DB: str = os.path.join(_PROJECT_ROOT, "data", "db", "ipcbns_mapping.db")
-    EVAL_LOG: str = os.path.join(_PROJECT_ROOT, "data", "eval_log.jsonl")
-    HUMAN_REVIEW_QUEUE: str = os.path.join(_PROJECT_ROOT, "data", "human_review_queue.jsonl")
-    CHROMA_DIR: str = os.path.join(_PROJECT_ROOT, settings["vectorstore"]["persist_dir"])
+    RAW_PDF: str = str(Path(_PROJECT_ROOT) / "data" / "raw" / "IPC-to-BNS-Conversion-Guide.pdf")
+    PROCESSED_CHUNKS: str = str(Path(_PROJECT_ROOT) / "data" / "processed" / "ipcbns_chunks.json")
+    SQLITE_DB: str = str(Path(_PROJECT_ROOT) / "data" / "db" / "ipcbns_mapping.db")
+    EVAL_LOG: str = str(Path(_PROJECT_ROOT) / "data" / "eval_log.jsonl")
+    HUMAN_REVIEW_QUEUE: str = str(Path(_PROJECT_ROOT) / "data" / "human_review_queue.jsonl")
+    CHROMA_DIR: str = str(Path(_PROJECT_ROOT) / settings["vectorstore"]["persist_dir"])
 
 
 paths = ProjectPaths()
@@ -150,6 +150,8 @@ def get_llm(config: Optional[LLMConfig] = None):
                 api_key=api_key,
                 temperature=config.temperature,
                 max_retries=1,  # fail fast → let fallback handle it
+                timeout=30,
+                max_output_tokens=2048,
             )
 
         primary: BaseChatModel = _make_google_llm(config.model)

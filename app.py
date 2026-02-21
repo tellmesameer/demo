@@ -34,14 +34,15 @@ st.markdown(
 LOG_DIR = ROOT / "logs"
 LOG_DIR.mkdir(exist_ok=True)
 log_format = "%(asctime)s - %(levelname)s - %(message)s"
-logging.basicConfig(
-    level=getattr(logging, settings.get("logging", {}).get("level", "INFO")),
-    format=log_format,
-    handlers=[
-        logging.FileHandler(LOG_DIR / "user_queries.log"),
-        logging.StreamHandler(),  # also print to terminal
-    ],
-)
+if not logging.getLogger().handlers:
+    logging.basicConfig(
+        level=getattr(logging, settings.get("logging", {}).get("level", "INFO")),
+        format=log_format,
+        handlers=[
+            logging.FileHandler(LOG_DIR / "user_queries.log"),
+            logging.StreamHandler(),  # also print to terminal
+        ],
+    )
 
 with st.sidebar:
     st.header("Configuration")

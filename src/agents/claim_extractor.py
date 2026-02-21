@@ -1,9 +1,10 @@
 import logging
+import re
 from typing import List
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from src.config import LLMConfig, get_llm
+from src.config import LLMConfig, get_llm, settings
 from src.graph.state import VerificationState
 from src.agents.utils import extract_text
 
@@ -32,26 +33,25 @@ def _parse_claims(text: str) -> List[str]:
     claims: List[str] = []
     for line in lines:
         # Strip leading numbers / bullets.
-        while line and line[0] in "0123456789).-) ":
-            line = line[1:].lstrip()
+        line = re.sub(r"^[\d.\-)\s]+", "", line)
         if len(line) > 5:
             claims.append(line)
     return claims
 
 
-def claim_extractor_node(state: VerificationState) -> VerificationState:
+def claim_extractor_node(state: VerificationState) -> dict:
     if state.get("route", "verify") == "direct":
-        state["claims"] = []
-        return state
+        return {"claims": []}
+
+    provider = state.get("llm_provider", settings["llm"]["provider"])
+    model = state.get("llm_model", settings["llm"]["model"])
 
     try:
-        llm = get_llm(LLMConfig())
+        llm = get_llm(LLMConfig(provider=provider, model=model))
         chain = prompt | llm  # type: ignore[operator]
         result = chain.invoke({"answer": state["llm_answer"]})
         content = extract_text(result)
-        state["claims"] = _parse_claims(content)
+        return {"claims": _parse_claims(content)}
     except Exception as e:
         logger.error("Claim extraction failed: %s", e, exc_info=True)
-        state["claims"] = []
-
-    return state
+        return {"claims": []}

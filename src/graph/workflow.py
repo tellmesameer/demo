@@ -46,19 +46,24 @@ def create_workflow():
     return g.compile()
 
 
+_compiled_workflow = None
+
+
 def run_workflow(
     question: str,
     llm_provider: str = settings["llm"]["provider"],
     llm_model: str = settings["llm"]["model"],
 ):
-    app = create_workflow()
+    global _compiled_workflow
+    if _compiled_workflow is None:
+        _compiled_workflow = create_workflow()
     initial: VerificationState = {
         "question": question,
         "llm_provider": llm_provider,
         "llm_model": llm_model,
         "metadata": {},
     }
-    final_state = app.invoke(initial)
+    final_state = _compiled_workflow.invoke(initial)
     return final_state
 
 

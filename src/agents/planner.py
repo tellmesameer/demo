@@ -3,7 +3,7 @@ import logging
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from src.config import LLMConfig, get_llm
+from src.config import LLMConfig, get_llm, settings
 from src.graph.state import VerificationState
 from src.agents.utils import extract_text
 
@@ -36,9 +36,12 @@ prompt = ChatPromptTemplate.from_messages(
 )
 
 
-def planner_node(state: VerificationState) -> VerificationState:
+def planner_node(state: VerificationState) -> dict:
+    provider = state.get("llm_provider", settings["llm"]["provider"])
+    model = state.get("llm_model", settings["llm"]["model"])
+
     try:
-        llm = get_llm(LLMConfig())
+        llm = get_llm(LLMConfig(provider=provider, model=model))
         # Try structured output first (works with primary model).
         try:
             chain = prompt | llm.with_structured_output(
@@ -63,12 +66,8 @@ def planner_node(state: VerificationState) -> VerificationState:
         if route not in {"verify", "direct"}:
             route = "verify"
 
-        state["plan"] = result.get("plan", "")
-        state["route"] = route  # type: ignore[assignment]
+        return {"plan": result.get("plan", ""), "route": route}
 
     except Exception as e:
         logger.error("Planner failed: %s", e, exc_info=True)
-        state["plan"] = f"Planner error: {e}"
-        state["route"] = "verify"  # type: ignore[assignment]
-
-    return state
+        return {"plan": f"Planner error: {e}", "route": "verify"}
