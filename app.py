@@ -77,18 +77,28 @@ provider, model = render_config(settings)
 render_predefined_prompts()
 question, run_pressed = render_query_input()
 
-# Status area (placeholder for live updates)
-status_area = st.container()
-render_status(status_area)
+# Status area (inline, no container wrapper)
+render_status(None)
 
-# ── Execute workflow ────────────────────────────────────────────────────────
+# ── Execute workflow (start on button press, run on subsequent rerun) ─────
 if run_pressed and question.strip():
     logging.info(
         f"User Question: {question.strip()} | Provider: {provider} | Model: {model}"
     )
+    # Mark running and request a rerun so the header/status updates immediately
     st.session_state["run_status"] = "running"
     st.session_state["run_step"] = 0
+    st.session_state["last_result"] = None
+    st.session_state["last_elapsed"] = 0.0
+    st.session_state["_start_run"] = True
+    st.rerun()
 
+# Actual workflow execution happens when `_start_run` is set. This lets the
+# UI render the "running" state first, then perform the long-running LLM call
+# on the next script run so the status indicator is visible during execution.
+if st.session_state.get("_start_run", False):
+    # clear the flag immediately to avoid repeated execution
+    st.session_state["_start_run"] = False
     try:
         t0 = time.perf_counter()
         result = run_workflow(

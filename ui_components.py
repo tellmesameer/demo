@@ -15,8 +15,9 @@ def inject_custom_css():
     """Inject the enterprise dark-theme CSS."""
     st.markdown("""
     <style>
-    /* ── Import font ────────────────────────────────────── */
+    /* ── Import fonts ───────────────────────────────────── */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&display=swap');
 
     /* ── Global overrides ───────────────────────────────── */
     html, body, [class*="st-"] {
@@ -25,6 +26,22 @@ def inject_custom_css():
 
     .stApp {
         background: #0f1117;
+    }
+
+    /* ── Container cleanup ──────────────────────────────── */
+    [data-testid="stColumns"] {
+        gap: 8px;
+        margin-bottom: 0px !important;
+    }
+    
+    /* Reduce all element wrapper padding */
+    [data-testid="stVerticalBlock"] {
+        padding: 0 !important;
+    }
+    
+    [data-testid="stVerticalBlockBorderContainer"] {
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
     /* Hide default Streamlit header / footer */
@@ -38,7 +55,7 @@ def inject_custom_css():
         border: 1px solid #2a2d3a;
         border-radius: 12px;
         padding: 20px 24px;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
     }
     .ui-card-compact {
@@ -46,7 +63,7 @@ def inject_custom_css():
         border: 1px solid #2a2d3a;
         border-radius: 10px;
         padding: 14px 18px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
     }
 
@@ -116,6 +133,14 @@ def inject_custom_css():
         border: 1px solid rgba(235, 87, 87, 0.18);
         font-size: 0.85rem;
         padding: 5px 14px;
+    /* Ensure Streamlit material icon placeholders render as icons */
+    [data-testid="stIconMaterial"], [data-testid="stIconMaterial"] * {
+        font-family: 'Material Symbols Rounded' !important;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        speak: none;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
         border-radius: 8px;
     }
     .badge-reliable {
@@ -251,6 +276,24 @@ def inject_custom_css():
         font-size: 0.82rem !important;
         font-weight: 500 !important;
         color: #9ca0b0 !important;
+        width: 100% !important;
+        word-wrap: break-word !important;
+        white-space: normal !important;
+        overflow: visible !important;
+    }
+    
+    section[data-testid="stSidebar"] summary {
+        overflow: visible !important;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+        min-width: 0 !important;
+    }
+    
+    section[data-testid="stSidebar"] summary > span,
+    section[data-testid="stSidebar"] summary > div {
+        overflow: visible !important;
+        word-break: break-word !important;
+        white-space: normal !important;
     }
 
     /* ── Text area / input styling ──────────────────────── */
@@ -267,6 +310,16 @@ def inject_custom_css():
     }
 
     /* ── Button overrides ───────────────────────────────── */
+    .stButton > button {
+        width: 100% !important;
+        white-space: normal !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        word-wrap: break-word !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
     .stButton > button[kind="primary"] {
         background: #4A90D9 !important;
         color: #fff !important;
@@ -274,7 +327,7 @@ def inject_custom_css():
         border-radius: 8px !important;
         font-size: 0.82rem !important;
         font-weight: 600 !important;
-        padding: 8px 24px !important;
+        padding: 8px 12px !important;
         letter-spacing: 0.02em;
         transition: all 0.2s ease;
     }
@@ -293,12 +346,49 @@ def inject_custom_css():
         border-radius: 8px !important;
         font-size: 0.78rem !important;
         font-weight: 500 !important;
-        padding: 6px 16px !important;
+        padding: 6px 12px !important;
         transition: all 0.2s ease;
     }
     .stButton > button[kind="secondary"]:hover {
         border-color: #4A90D9 !important;
         color: #4A90D9 !important;
+    }
+
+    /* ── Sidebar-specific button adjustments ──────────────── */
+    section[data-testid="stSidebar"] .stButton > button {
+        width: 100% !important;
+        min-width: 0 !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        padding: 8px 10px !important;
+        height: auto !important;
+        line-height: 1.4 !important;
+        word-break: break-word !important;
+    }
+    
+    section[data-testid="stSidebar"] .stExpander {
+        width: 100% !important;
+    }
+    
+    section[data-testid="stSidebar"] [data-testid="stExpanderToggleButton"] {
+        min-width: 0 !important;
+        overflow: visible !important;
+    }
+    
+    section[data-testid="stSidebar"] details {
+        width: 100% !important;
+    }
+    
+    section[data-testid="stSidebar"] details summary {
+        display: flex !important;
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+    
+    section[data-testid="stSidebar"] details summary > * {
+        min-width: 0 !important;
+        overflow: visible !important;
+        flex-shrink: 1 !important;
     }
 
     /* ── Progress bar ───────────────────────────────────── */
@@ -314,7 +404,7 @@ def inject_custom_css():
         color: #5a5e70;
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
     /* ── Verdict display ────────────────────────────────── */
@@ -365,7 +455,8 @@ def inject_custom_css():
         min-height: 90px;
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 5px;
+        margin-bottom: 0px;
     }
     .prompt-card:hover {
         border-color: rgba(74, 144, 217, 0.4);
@@ -391,6 +482,55 @@ def inject_custom_css():
         font-weight: 400;
     }
     </style>
+    """, unsafe_allow_html=True)
+
+    # JS fallback: replace raw Material icon text with inline SVGs when font doesn't render
+    st.markdown("""
+    <script>
+    (function(){
+        const svgs = {
+            "keyboard_arrow_right": '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            "keyboard_arrow_left": '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            "keyboard_arrow_up": '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 14l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            "keyboard_arrow_down": '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 10l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            "keyboard_double_arrow_right": '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 6l6 6-6 6M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            "settings": '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06A2 2 0 0 1 2.7 17.88l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09c.7 0 1.28-.4 1.51-1a1.65 1.65 0 0 0-.33-1.82L4.31 4.7A2 2 0 0 1 7.14 1.9l.06.06A1.65 1.65 0 0 0 9 2.29c.4.23 1 .37 1.51.37H11a2 2 0 0 1 4 0h.09c.7 0 1.28-.14 1.51-.37.56-.32 1.28.1 1.51.61l.06.06a2 2 0 0 1 2.83 2.83l-.06.06c-.23.51-.37 1.11-.37 1.51V9a2 2 0 0 1 0 4h-.09c-.7 0-1.28.4-1.51 1z" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        };
+
+        function shouldReplace(el){
+            if(!el) return false;
+            if(el.querySelector && el.querySelector('svg')) return false;
+            const txt = (el.textContent|| '').trim();
+            if(!txt) return false;
+            if(txt.length === 1) return false;
+            const cs = window.getComputedStyle(el);
+            if(cs && cs.fontFamily && /Material Symbols/i.test(cs.fontFamily)) return false;
+            return true;
+        }
+
+        function replaceIcons(root=document){
+            const nodes = root.querySelectorAll('[data-testid="stIconMaterial"]');
+            nodes.forEach(el => {
+                try{
+                    if(!shouldReplace(el)) return;
+                    const key = (el.textContent||'').trim();
+                    const svg = svgs[key] || svgs[key.replace(/\s+/g,'_')] || null;
+                    if(svg){
+                        el.classList.add('icon-svg-fallback');
+                        el.innerHTML = svg;
+                    } else {
+                        el.classList.add('icon-svg-fallback');
+                        el.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>';
+                    }
+                }catch(e){/*noop*/}
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function(){ replaceIcons(document); });
+        const mo = new MutationObserver((muts)=>{ replaceIcons(document); });
+        mo.observe(document.body, { childList:true, subtree:true });
+    })();
+    </script>
     """, unsafe_allow_html=True)
 
 
@@ -459,14 +599,15 @@ def render_config(settings: dict) -> tuple[str, str]:
             label_visibility="collapsed",
         )
 
-        with st.expander("Advanced Settings", expanded=False):
-            st.markdown(f"""
-            <div style="font-size:0.75rem; color:#7c8091; line-height:1.8;">
-                <b>Temperature:</b> {settings['llm'].get('temperature', 0.2)}<br>
-                <b>Embedding:</b> {settings.get('embedding', {}).get('model', 'default')}<br>
-                <b>Human review threshold:</b> {settings.get('verification', {}).get('human_review_confidence_threshold', 0.7)}
-            </div>
-            """, unsafe_allow_html=True)
+        # Make Advanced Settings non-collapsible to avoid overflow/collapse issues
+        st.markdown('<div class="section-label">Advanced Settings</div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div style="font-size:0.75rem; color:#7c8091; line-height:1.8;">
+            <b>Temperature:</b> {settings['llm'].get('temperature', 0.2)}<br>
+            <b>Embedding:</b> {settings.get('embedding', {}).get('model', 'default')}<br>
+            <b>Human review threshold:</b> {settings.get('verification', {}).get('human_review_confidence_threshold', 0.7)}
+        </div>
+        """, unsafe_allow_html=True)
 
         st.markdown("""
         <div style="margin-top:24px; padding-top:16px; border-top:1px solid #2a2d3a;">
@@ -505,7 +646,7 @@ _PREDEFINED_PROMPTS = [
 
 def render_predefined_prompts():
     """Render the Quick Start prompt cards. Sets session_state['query_input'] on click."""
-    st.markdown('<div class="section-label" style="margin-bottom:6px;">Quick Start</div>',
+    st.markdown('<div class="section-label" style="margin-bottom:4px; margin-top:0px;">Quick Start</div>',
                 unsafe_allow_html=True)
 
     cols = st.columns(3, gap="small")
@@ -533,8 +674,10 @@ def render_predefined_prompts():
 
 def render_query_input() -> tuple[str, bool]:
     """Render the query card. Returns (question, run_pressed)."""
+    # Render the query card with its label inside to avoid an empty
+    # container appearing between the examples and the input.
     st.markdown('<div class="ui-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-label">Query</div>',
+    st.markdown('<div class="section-label" style="margin-bottom:8px; margin-top:0px;">Query</div>',
                 unsafe_allow_html=True)
 
     default_q = st.session_state.get(
@@ -593,49 +736,49 @@ def _render_step_tracker_html(completed: int):
     return '<div class="step-tracker">' + "".join(parts) + "</div>"
 
 
-def render_status(status_container):
-    """Render the status card area. Returns the container for updates."""
-    with status_container:
-        run_status = st.session_state.get("run_status", "idle")
-        if run_status == "idle":
-            st.markdown("""
-            <div class="ui-card-compact">
-                <div class="section-label">Status</div>
-                <span style="font-size:0.82rem; color:#5a5e70;">
-                    Ready — submit a query to begin verification
-                </span>
-            </div>
-            """, unsafe_allow_html=True)
-        elif run_status == "running":
-            step = st.session_state.get("run_step", 0)
-            tracker_html = _render_step_tracker_html(step)
-            st.markdown(f"""
-            <div class="ui-card-compact">
-                <div class="section-label">Running</div>
-                {tracker_html}
-            </div>
-            """, unsafe_allow_html=True)
-            st.progress(min(int((step / len(_STEPS)) * 100), 100))
-        elif run_status == "success":
-            elapsed = st.session_state.get("last_elapsed", 0)
-            tracker_html = _render_step_tracker_html(len(_STEPS))
-            st.markdown(f"""
-            <div class="ui-card-compact">
-                <div class="section-label">Complete</div>
-                {tracker_html}
-                <div class="elapsed-time">Completed in {elapsed:.1f}s</div>
-            </div>
-            """, unsafe_allow_html=True)
-            st.progress(100)
-        elif run_status == "failed":
-            st.markdown("""
-            <div class="ui-card-compact">
-                <div class="section-label">Failed</div>
-                <span style="font-size:0.82rem; color:#eb5757;">
-                    An error occurred. Check the debug logs.
-                </span>
-            </div>
-            """, unsafe_allow_html=True)
+def render_status(status_container=None):
+    """Render the status card area. Renders inline if status_container is None."""
+    run_status = st.session_state.get("run_status", "idle")
+    
+    if run_status == "idle":
+        st.markdown("""
+        <div class="ui-card-compact" style="margin-top: 8px; margin-bottom: 4px;">
+            <div class="section-label">Status</div>
+            <span style="font-size:0.82rem; color:#5a5e70;">
+                Ready — submit a query to begin verification
+            </span>
+        </div>
+        """, unsafe_allow_html=True)
+    elif run_status == "running":
+        step = st.session_state.get("run_step", 0)
+        tracker_html = _render_step_tracker_html(step)
+        st.markdown(f"""
+        <div class="ui-card-compact" style="margin-top: 8px; margin-bottom: 4px;">
+            <div class="section-label">Running</div>
+            {tracker_html}
+        </div>
+        """, unsafe_allow_html=True)
+        st.progress(min(int((step / len(_STEPS)) * 100), 100))
+    elif run_status == "success":
+        elapsed = st.session_state.get("last_elapsed", 0)
+        tracker_html = _render_step_tracker_html(len(_STEPS))
+        st.markdown(f"""
+        <div class="ui-card-compact" style="margin-top: 8px; margin-bottom: 4px;">
+            <div class="section-label">Complete</div>
+            {tracker_html}
+            <div class="elapsed-time">Completed in {elapsed:.1f}s</div>
+        </div>
+        """, unsafe_allow_html=True)
+        st.progress(100)
+    elif run_status == "failed":
+        st.markdown("""
+        <div class="ui-card-compact" style="margin-top: 8px; margin-bottom: 4px;">
+            <div class="section-label">Failed</div>
+            <span style="font-size:0.82rem; color:#eb5757;">
+                An error occurred. Check the debug logs.
+            </span>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 def render_loading_skeleton():
@@ -656,6 +799,8 @@ def render_loading_skeleton():
 
 def render_metrics(final: dict):
     """Render the 4-column metrics row."""
+    st.markdown('<div style="margin-top: 16px; margin-bottom: 8px;"></div>', unsafe_allow_html=True)
+    
     overall = final.get("overall_status", "").upper()
     confidence = final.get("average_confidence", 0.0)
     supported = final.get("supported_claims", 0)
