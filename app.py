@@ -12,7 +12,11 @@ load_dotenv()
 ROOT = Path(__file__).resolve().parent
 sys.path.append(str(ROOT))
 
+from src.config import init_data_dirs, settings  # noqa: E402
 from src.graph.workflow import run_workflow  # noqa: E402
+
+# Ensure data directories and seed files exist before anything else.
+init_data_dirs()
 
 st.set_page_config(
     page_title="Hallucination Guardrail – IPC/BNS",
@@ -31,7 +35,7 @@ LOG_DIR = ROOT / "logs"
 LOG_DIR.mkdir(exist_ok=True)
 log_format = "%(asctime)s - %(levelname)s - %(message)s"
 logging.basicConfig(
-    level=logging.INFO,
+    level=getattr(logging, settings.get("logging", {}).get("level", "INFO")),
     format=log_format,
     handlers=[
         logging.FileHandler(LOG_DIR / "user_queries.log"),
@@ -45,11 +49,13 @@ with st.sidebar:
     provider = st.selectbox(
         "LLM Provider",
         ["google", "offline", "openai", "anthropic"],
-        index=0,
+        index=["google", "offline", "openai", "anthropic"].index(
+            settings["llm"]["provider"]
+        ),
         help="Gemini (google) is recommended and free with Jio.",
     )
 
-    default_model = "gemini-2.5-flash" if provider == "google" else ""
+    default_model = settings["llm"]["model"] if provider == "google" else ""
     model = st.text_input(
         "Model name",
         value=default_model,

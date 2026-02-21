@@ -6,6 +6,7 @@ from src.agents.human_validation import human_validation_node
 from src.agents.planner import planner_node
 from src.agents.primary_llm import primary_llm_node
 from src.agents.verifier import verifier_node
+from src.config import settings
 from src.graph.state import VerificationState
 
 
@@ -47,8 +48,8 @@ def create_workflow():
 
 def run_workflow(
     question: str,
-    llm_provider: str = "google",
-    llm_model: str = "gemini-2.5-flash",
+    llm_provider: str = settings["llm"]["provider"],
+    llm_model: str = settings["llm"]["model"],
 ):
     app = create_workflow()
     initial: VerificationState = {

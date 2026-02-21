@@ -6,14 +6,9 @@ from sqlalchemy import Column, MetaData, String, Table, create_engine, select
 from sqlalchemy.engine import Engine
 
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_community.vectorstores import Chroma
-# and ensure: pip install langchain-community chromadb
-
 from langchain_chroma import Chroma
-# and ensure: pip install langchain-chroma chromadb
 
-
-from src.config import paths
+from src.config import paths, EMBEDDING_MODEL
 
 
 class IPCBNSRelationalStore:
@@ -70,11 +65,11 @@ class IPCBNSVectorStore:
 
     def __init__(self, persist_dir: Optional[str] = None):
         if persist_dir is None:
-            persist_dir = str(Path(paths.ROOT) / "data" / "chroma_ipcbns")
+            persist_dir = paths.CHROMA_DIR
         self.persist_dir = persist_dir
         Path(self.persist_dir).parent.mkdir(parents=True, exist_ok=True)
         self.embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/gemini-embedding-001"
+            model=EMBEDDING_MODEL,
         )
         self.store: Optional[Chroma] = None
 

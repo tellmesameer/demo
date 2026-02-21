@@ -2,7 +2,7 @@ import logging
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from src.config import LLMConfig, get_llm
+from src.config import LLMConfig, get_llm, settings
 from src.graph.state import VerificationState
 from src.agents.utils import extract_text
 
@@ -26,8 +26,8 @@ prompt = ChatPromptTemplate.from_messages(
 
 
 def primary_llm_node(state: VerificationState) -> VerificationState:
-    provider = state.get("llm_provider", "google")
-    model = state.get("llm_model", "gemini-2.5-flash")
+    provider = state.get("llm_provider", settings["llm"]["provider"])
+    model = state.get("llm_model", settings["llm"]["model"])
 
     try:
         llm = get_llm(LLMConfig(provider=provider, model=model))

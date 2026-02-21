@@ -1,0 +1,22 @@
+llm:
+  provider: "google"
+  model: "gemini-2.5-flash"
+  temperature: 0.2
+  fallback_models:
+    - "gemini-2.5-flash"
+    - "gemini-3-flash-preview"
+    - "gemini-2.0-flash"
+    - "gemini-2.0-flash-lite"
+    - "gemini-2.5-flash-lite"
+
+embedding:
+  model: "models/gemini-embedding-001"
+
+vectorstore:
+  persist_dir: "data/chroma_ipcbns"
+
+verification:
+  human_review_confidence_threshold: 0.7
+
+logging:
+  level: "INFO"

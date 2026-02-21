@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from src.config import paths
+from src.config import paths, HUMAN_REVIEW_THRESHOLD
 from src.graph.state import VerificationState
 
 
@@ -16,7 +16,7 @@ def human_validation_node(state: VerificationState) -> VerificationState:
     overall = final.get("overall_status", "unknown")
     avg_conf = float(final.get("average_confidence", 0.0))
 
-    needs = overall in {"unreliable", "uncertain"} or avg_conf < 0.7
+    needs = overall in {"unreliable", "uncertain"} or avg_conf < HUMAN_REVIEW_THRESHOLD
     state["needs_human"] = needs
 
     if not needs:
@@ -31,8 +31,7 @@ def human_validation_node(state: VerificationState) -> VerificationState:
         "final_result": final,
     }
 
-    queue_path = Path(paths.ROOT) / "data" / "human_review_queue.jsonl"
-    queue_path.parent.mkdir(parents=True, exist_ok=True)
+    queue_path = Path(paths.HUMAN_REVIEW_QUEUE)
     with queue_path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
